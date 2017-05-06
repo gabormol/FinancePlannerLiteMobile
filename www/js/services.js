@@ -2,7 +2,7 @@
 
 angular.module('FPLite.services', ['ngResource'])
 .constant("baseURL", "https://financeplannerlite.mybluemix.net/")
- //.constant("baseURL", "http://localhost:3000/")
+ //.constant("baseURL", "http://192.168.2.74:3000/")
 .factory('expenseFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
 
         return $resource(baseURL + "expenses/:id", null, {
