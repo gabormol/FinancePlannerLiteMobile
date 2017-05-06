@@ -1,0 +1,25 @@
+<ion-modal-view>
+    <ion-header-bar>
+      <h1 class="title">Add new Expense</h1>
+      <div class="buttons">
+        <button class="button button-clear" ng-click="closeAddModal()">Close</button>
+      </div>
+    </ion-header-bar>
+    <ion-content>
+      <form ng-submit="doAddExpense(newExpensename,newExpenseAmount)">
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label">Expense Name</span>
+            <input type="text" ng-model="newExpensename" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Planned</span>
+            <input type="number" step="any" ng-model="newExpenseAmount" required>
+          </label>
+          <label class="item">
+            <button class="button button-block button-positive" type="submit">Add</button>
+          </label>
+        </div>
+      </form>
+    </ion-content>
+    </ion-modal-view>

@@ -1,0 +1,29 @@
+<ion-modal-view>
+    <ion-header-bar>
+      <h1 class="title">Modify Item</h1>
+      <div class="buttons">
+        <button class="button button-clear" ng-click="closeModifyModal()">Close</button>
+      </div>
+    </ion-header-bar>
+    <ion-content>
+      <form ng-submit="doModifyItem(modItemName,modItemPlanned,modItemAmount,modItemId,timesheetId)">
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label">Item Name</span>
+            <input type="text" ng-model="modItemName" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Planned</span>
+            <input type="number" step="any" ng-model="modItemPlanned" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Paid</span>
+            <input type="number" step="any" ng-model="modItemAmount" required>
+          </label>
+          <label class="item">
+            <button class="button button-block button-positive" type="submit">Modify</button>
+          </label>
+        </div>
+      </form>
+    </ion-content>
+    </ion-modal-view>

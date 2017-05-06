@@ -1,0 +1,33 @@
+<ion-view view-title="Balance">
+  <ion-content>
+    <div ng-if="showLoading">
+      LOADING...
+    </div>
+      <div class="card" ng-if="!showLoading">
+          <div class="item item-divider">
+            <div class="row">
+              <div class = "col col-90"></div>
+            </div>
+          </div>
+          <div class="item item-text-wrap">
+                <div class="row">
+                  <div class = "col col-50"><h2><b>Planned To Spend:  </b></h2></div>
+                  <div class = "col col-50"><p>{{balance[0].plannedToSpend|currency}}</p></div>
+                </div>
+              </div>
+        </div>
+        <div class="card" ng-if="!showLoading">
+            <div class="item item-divider">
+              <div class="row">
+                <div class = "col col-90"></div>
+              </div>
+            </div>
+            <div class="item item-text-wrap">
+              <div class="row">
+                <div class = "col col-50"><h2><b>Total Spent:  </b></h2></div>
+                <div class = "col col-50"><p>{{balance[0].totalSpent|currency}}</p></div>
+              </div>
+                </div>
+          </div>
+  </ion-content>
+</ion-view>

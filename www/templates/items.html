@@ -1,0 +1,32 @@
+<ion-view view-title="Actual Timesheet">
+  <ion-content>
+    <div ng-if="showLoading">
+      LOADING...
+    </div>
+    <div ng-repeat="expense in expenses | orderBy:'expensename'">
+      <div class="card">
+          <div class="item item-divider">
+            <div class="row">
+              <div class = "col col-90">{{expense.expensename}}</div>
+              <div class = "col col-5"><i class="icon ion-edit" ng-click="editExpense(expense.expensename, expense.amount, expense._id)"></i></div>
+              <div class = "col col-5"><i class="icon ion-trash-a" ng-click="doDeleteExpense(expense._id)"></i></div>
+          </div>
+          <div class="item item-text-wrap">
+                <h2>Planned:</h2>
+                <p>{{expense.amount}}</p>
+          </div>
+      </div>
+    </div>
+  </div>
+    <div class="card" ng-click="addNewExpense()">
+        <div class="item item-divider">
+          Add new
+        </div>
+        <div class="item item-text-wrap">
+              <h2>Click here to add new expense</h2>
+        </div>
+    </div>
+
+
+  </ion-content>
+</ion-view>
