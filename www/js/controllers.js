@@ -113,7 +113,6 @@ angular.module('FPLite.controllers', [])
 })
 
 .controller('TimesheetController', ['$scope', 'baseURL', '$ionicListDelegate', '$ionicPlatform', '$cordovaLocalNotification', '$cordovaToast', '$ionicModal', 'timesheetFactory', 'currencyFilter', function ($scope, baseURL, $ionicListDelegate, $ionicPlatform, $cordovaLocalNotification, $cordovaToast, $ionicModal, timesheetFactory, currencyFilter) {
-  console.log("Timesheet Controller called...");
   $scope.showLoading = true;
 
   $scope.newItemName = "";
@@ -121,13 +120,11 @@ angular.module('FPLite.controllers', [])
   $scope.newItemAmount = 0;
 
   $scope.resetNewItemProps = function(){
-    console.log('RESET newItem properties...');
+
     $scope.newItemName = "";
     $scope.newItemPlanned = 0;
     $scope.newItemAmount = 0;
-    console.log('newItemName: ' + $scope.newItemName);
-    console.log('newItemPlanned: ' + $scope.newItemPlanned);
-    console.log('newItemAmount: ' + $scope.newItemAmount);
+
   }
 
 
@@ -177,7 +174,6 @@ angular.module('FPLite.controllers', [])
       $scope.getTimesheet();
 
       $scope.doAddItem = function(itemName, itemPlanned, itemPaid, timesheetId) {
-          console.log('Adding new item called... ' + itemName + " " + itemPlanned + " " + itemPaid);
 
           $scope.newItem = {
           itemName: itemName,
@@ -190,7 +186,6 @@ angular.module('FPLite.controllers', [])
                                 $scope.showLoading = false;
                                 $scope.getTimesheet();
                                 $scope.resetNewItemProps();
-                                console.log("Item added!!!");
                                 $scope.closeAddModal();
                             },
                             function (response) {
@@ -241,9 +236,7 @@ angular.module('FPLite.controllers', [])
       };
 
       $scope.addNewItem = function() {
-        console.log('Opening add nem item modal...');
         $scope.resetNewItemProps();
-        console.log('Showing modal...');
         createAndShowAddNewItemModal();
         //$scope.addnewitemmodal.show();
 
@@ -263,7 +256,6 @@ angular.module('FPLite.controllers', [])
       }
 
       $scope.closeAddModal = function(){
-        console.log('Closing add modal...');
         $scope.addnewitemmodal.hide();
         $scope.addnewitemmodal.remove();
       }
@@ -314,10 +306,66 @@ $scope.getStatistics = function(){
 
 }])
 
-.controller('UserSettingsController', ['$scope', 'baseURL', function ($scope, $state, baseURL) {
+.controller('UserSettingsController', ['$scope', 'userSettingsFactory', '$ionicPlatform', '$ionicModal', function ($scope, userSettingsFactory, $ionicPlatform, $ionicModal) {
 
+$scope.showLoading = true;
 
+// Create the modiusersettings modal that we will use later
+var createAndShowModifyUserSettingsModal = function(){
 
+  $ionicModal.fromTemplateUrl('templates/modifyuserparam.html', {
+      scope: $scope
+    }).then(function (modal) {
+      $scope.modifyusersettingsmodal = modal;
+      $scope.modifyusersettingsmodal.show();
+    });
+  }
+
+  var closeModifyUserSettingsModal = function(){
+    $scope.modifyusersettingsmodal.hide();
+    $scope.modifyusersettingsmodal.remove();
+  }
+
+    $scope.userSettings = {
+        currencyDecimals : '',
+        currencySymbol : '',
+        lastname : '',
+        firstname : ''
+    };
+
+    userSettingsFactory.query(
+            function (response) {
+                $scope.showLoading = false;
+                $scope.userSettings.currencyDecimals = response[0].currencyDecimals;
+                $scope.userSettings.currencySymbol = response[0].currencySymbol;
+                $scope.userSettings.lastname = response[0].lastname;
+                $scope.userSettings.firstname = response[0].firstname;
+            },
+            function (response) {
+                $scope.message = "Error: " + response.status + " " + response.statusText;
+            }
+        );
+
+      $scope.modifyUserSettings = function(){
+          createAndShowModifyUserSettingsModal();
+        }
+
+    $scope.doModifyUserSettings = function() {
+        userSettingsFactory.update($scope.userSettings).$promise.then(
+                            function (response) {
+                                $scope.showLoading = false;
+                                closeModifyUserSettingsModal();
+
+                            },
+                            function (response) {
+                                $scope.message = "Error: " + response.status + " " + response.statusText;
+                                $scope.showLoading = false;
+                            });
+    };
+
+    /*$scope.cancelNgDialogue = function() {
+        ngDialog.close();
+    };*/
 
 }])
 

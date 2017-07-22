@@ -1,0 +1,33 @@
+<ion-modal-view>
+    <ion-header-bar>
+      <h1 class="title">Modify User Settings</h1>
+      <div class="buttons">
+        <button class="button button-clear" ng-click="closeModifyUserSettingsModal()">Close</button>
+      </div>
+    </ion-header-bar>
+    <ion-content>
+      <form ng-submit="doModifyUserSettings()">
+        <div class="list">
+          <label class="item item-input">
+            <span class="input-label">First Name:</span>
+            <input type="text" ng-model="userSettings.firstname" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Last Name:</span>
+            <input type="text" ng-model="userSettings.lastname" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Currency Code:</span>
+            <input type="text" ng-model="userSettings.currencySymbol" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Number of Decimals:</span>
+            <input type="text" ng-model="userSettings.currencyDecimals" required>
+          </label>
+          <label class="item">
+            <button class="button button-block button-positive" type="submit">Modify</button>
+          </label>
+        </div>
+      </form>
+    </ion-content>
+    </ion-modal-view>

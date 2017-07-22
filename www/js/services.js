@@ -53,6 +53,16 @@ angular.module('FPLite.services', ['ngResource'])
   }
 }])
 
+.factory('userSettingsFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
+
+    return $resource(baseURL + "users/mydata", null, {
+            'update': {
+                method: 'PUT'
+            }
+        });
+
+}])
+
 .factory('AuthFactory', ['$resource', '$http', '$localStorage', '$rootScope', 'baseURL', '$ionicPopup', function($resource, $http, $localStorage, $rootScope, baseURL, $ionicPopup){
 
     var authFac = {};
