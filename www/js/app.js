@@ -91,6 +91,15 @@ angular.module('FPLite', ['ionic', 'ngCordova', 'FPLite.controllers','FPLite.ser
           controller: 'TimesheetController'
         }
       }
+    })
+    .state('app.usersettings', {
+      url: '/usersettings',
+      views: {
+        'mainContent': {
+          templateUrl: 'templates/usersettings.html',
+          controller: 'UserSettingsController'
+        }
+      }
     });
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/app/home');

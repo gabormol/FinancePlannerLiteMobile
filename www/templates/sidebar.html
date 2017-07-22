@@ -45,6 +45,12 @@
         <ion-item menu-close ng-click="register()">
           Register
         </ion-item>
+        <ion-item class="item-divider">
+          User Settings
+        </ion-item>
+        <ion-item menu-close href="#/app/usersettings" ng-if="loggedIn">
+          Change settings
+        </ion-item>
       </ion-list>
     </ion-content>
   </ion-side-menu>

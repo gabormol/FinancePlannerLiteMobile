@@ -120,20 +120,36 @@ angular.module('FPLite.controllers', [])
   $scope.newItemPlanned = 0;
   $scope.newItemAmount = 0;
 
+  $scope.resetNewItemProps = function(){
+    console.log('RESET newItem properties...');
+    $scope.newItemName = "";
+    $scope.newItemPlanned = 0;
+    $scope.newItemAmount = 0;
+    console.log('newItemName: ' + $scope.newItemName);
+    console.log('newItemPlanned: ' + $scope.newItemPlanned);
+    console.log('newItemAmount: ' + $scope.newItemAmount);
+  }
+
 
   // Create the modifyexpense modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/modifyitem.html', {
-      scope: $scope
-  }).then(function (modal) {
-      $scope.modifyitemmodal = modal;
-  });
+  var createAndShowModifyItemModal = function(){
+    $ionicModal.fromTemplateUrl('templates/modifyitem.html', {
+        scope: $scope
+      }).then(function (modal) {
+        $scope.modifyitemmodal = modal;
+        $scope.modifyitemmodal.show();
+      });
+    }
 
   // Create the addnewexpense modal that we will use later
-  $ionicModal.fromTemplateUrl('templates/addnewitem.html', {
-      scope: $scope
-  }).then(function (modal) {
-      $scope.addnewitemmodal = modal;
-  });
+ var createAndShowAddNewItemModal = function(){
+    $ionicModal.fromTemplateUrl('templates/addnewitem.html', {
+        scope: $scope
+      }).then(function (modal) {
+        $scope.addnewitemmodal = modal;
+        $scope.addnewitemmodal.show();
+      });
+    }
 
   // Create the deleteconfirm modal
   $ionicModal.fromTemplateUrl('templates/deleteitemconfirm.html', {
@@ -158,7 +174,7 @@ angular.module('FPLite.controllers', [])
           );
         }
 
-        $scope.getTimesheet();
+      $scope.getTimesheet();
 
       $scope.doAddItem = function(itemName, itemPlanned, itemPaid, timesheetId) {
           console.log('Adding new item called... ' + itemName + " " + itemPlanned + " " + itemPaid);
@@ -173,14 +189,15 @@ angular.module('FPLite.controllers', [])
                             function (response) {
                                 $scope.showLoading = false;
                                 $scope.getTimesheet();
+                                $scope.resetNewItemProps();
                                 console.log("Item added!!!");
+                                $scope.closeAddModal();
                             },
                             function (response) {
                                 $scope.message = "Error: " + response.status + " " + response.statusText;
                                 $scope.showLoading = false;
                             });
 
-          $scope.closeAddModal();
 
       };
 
@@ -196,12 +213,12 @@ angular.module('FPLite.controllers', [])
                             function (response) {
                                 $scope.showLoading = false;
                                 $scope.getTimesheet();
+                                $scope.closeModifyModal();
                             },
                             function (response) {
                                 $scope.message = "Error: " + response.status + " " + response.statusText;
                                 $scope.showLoading = false;
                             });
-          $scope.closeModifyModal();
 
       };
 
@@ -224,8 +241,11 @@ angular.module('FPLite.controllers', [])
       };
 
       $scope.addNewItem = function() {
-
-        $scope.addnewitemmodal.show();
+        console.log('Opening add nem item modal...');
+        $scope.resetNewItemProps();
+        console.log('Showing modal...');
+        createAndShowAddNewItemModal();
+        //$scope.addnewitemmodal.show();
 
       }
 
@@ -237,16 +257,20 @@ angular.module('FPLite.controllers', [])
         $scope.timesheetId = timesheetId;
         $scope.modItemId = itemId;
 
-        $scope.modifyitemmodal.show();
+        //$scope.modifyitemmodal.show();
+        createAndShowModifyItemModal();
 
       }
 
       $scope.closeAddModal = function(){
+        console.log('Closing add modal...');
         $scope.addnewitemmodal.hide();
+        $scope.addnewitemmodal.remove();
       }
 
       $scope.closeModifyModal = function(){
         $scope.modifyitemmodal.hide();
+        $scope.modifyitemmodal.remove();
       }
 
       $scope.closeDeleteConfirmModal = function(){
@@ -289,6 +313,14 @@ $scope.getStatistics = function(){
 
 
 }])
+
+.controller('UserSettingsController', ['$scope', 'baseURL', function ($scope, $state, baseURL) {
+
+
+
+
+}])
+
 
 .controller('ExpenseController', ['$scope', '$state', 'baseURL', 'expenseFactory', '$ionicModal', function ($scope, $state, baseURL, expenseFactory, $ionicModal) {
 
