@@ -1,12 +1,14 @@
 <ion-modal-view>
     <ion-header-bar>
-      <h1 class="title">Deleting Item</h1>
+      <h1 class="title">Are You sure?</h1>
     </ion-header-bar>
     <ion-content padding>
-      <h5>Are you sure?</h5>
-      <p>
-      <button ion-button color="danger">YES</button>
-      <button ion-button color="light" ng-click="closeDeleteConfirmModal()">NO</button>
-      </p>
+      <form ng-submit="doDeleteItem()">
+        <div class="list">
+          <label class="item">
+            <button class="button button-block button-positive" color="danger" type="submit">OK</button>
+          </label>
+        </div>
+      </form>
     </ion-content>
   </ion-modal-view>

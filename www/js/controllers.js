@@ -112,8 +112,19 @@ angular.module('FPLite.controllers', [])
 
 })
 
-.controller('TimesheetController', ['$scope', 'baseURL', '$ionicListDelegate', '$ionicPlatform', '$cordovaLocalNotification', '$cordovaToast', '$ionicModal', 'timesheetFactory', 'currencyFilter', function ($scope, baseURL, $ionicListDelegate, $ionicPlatform, $cordovaLocalNotification, $cordovaToast, $ionicModal, timesheetFactory, currencyFilter) {
+.controller('TimesheetController', ['$scope', 'baseURL', '$ionicListDelegate', '$ionicPlatform', '$cordovaLocalNotification', '$cordovaToast', '$ionicModal', 'timesheetFactory', 'userSettingsFactory', function ($scope, baseURL, $ionicListDelegate, $ionicPlatform, $cordovaLocalNotification, $cordovaToast, $ionicModal, timesheetFactory, userSettingsFactory) {
   $scope.showLoading = true;
+
+  $scope.currencyCodeForExpense = '';
+
+  userSettingsFactory.query(
+          function (response) {
+              $scope.currencyCodeForExpense = response[0].currencySymbol;
+          },
+          function (response) {
+              $scope.message = "Error: " + response.status + " " + response.statusText;
+          }
+      );
 
   $scope.newItemName = "";
   $scope.newItemPlanned = 0;
@@ -149,11 +160,14 @@ angular.module('FPLite.controllers', [])
     }
 
   // Create the deleteconfirm modal
-  $ionicModal.fromTemplateUrl('templates/deleteitemconfirm.html', {
-      scope: $scope
-  }).then(function (modal) {
-      $scope.deleteitemconfirm = modal;
-  });
+  var createAndShowDeleteItemModal = function(){
+    $ionicModal.fromTemplateUrl('templates/deleteitemconfirm.html', {
+        scope: $scope
+      }).then(function (modal) {
+        $scope.deleteitemconfirm = modal;
+        $scope.deleteitemconfirm.show();
+      });
+    }
 
     $scope.timeshet = {};
 
@@ -217,13 +231,25 @@ angular.module('FPLite.controllers', [])
 
       };
 
-      $scope.doDeleteItem = function(amountPaid, timesheetId, itemId) {
+      var amountPaidForDelete;
+      var timesheetIdForDelete;
+      var itemIdForDelete;
+
+      $scope.deleteItem = function(amountPaid, timesheetId, itemId){
+        createAndShowDeleteItemModal();
+        amountPaidForDelete = amountPaid;
+        timesheetIdForDelete = timesheetId;
+        itemIdForDelete = itemId;
+      }
+
+      $scope.doDeleteItem = function() {
 
           //$scope.deleteexpenseconfirm.show();
-          if(amountPaid === 0){
-          timesheetFactory.delete({id:timesheetId, itemId:itemId}).$promise.then(
+          if(amountPaidForDelete === 0){
+          timesheetFactory.delete({id:timesheetIdForDelete, itemId:itemIdForDelete}).$promise.then(
                             function (response) {
                                 $scope.showLoading = false;
+                                $scope.closeDeleteConfirmModal();
                                 $scope.getTimesheet();
                             },
                             function (response) {
@@ -267,6 +293,7 @@ angular.module('FPLite.controllers', [])
 
       $scope.closeDeleteConfirmModal = function(){
         $scope.deleteitemconfirm.hide();
+        $scope.deleteitemconfirm.remove();
       }
 
       $scope.backToActoins = function(){
@@ -275,9 +302,20 @@ angular.module('FPLite.controllers', [])
 
 }])
 
-.controller('BalanceController', ['$scope', '$ionicModal', '$timeout', 'statisticsFactory', function ($scope, $ionicModal, $timeout, statisticsFactory) {
+.controller('BalanceController', ['$scope', '$ionicModal', '$timeout', 'statisticsFactory', 'userSettingsFactory', function ($scope, $ionicModal, $timeout, statisticsFactory, userSettingsFactory) {
 
 $scope.showLoading = true;
+
+$scope.currencyCodeForExpense = '';
+
+userSettingsFactory.query(
+        function (response) {
+            $scope.currencyCodeForExpense = response[0].currencySymbol;
+        },
+        function (response) {
+            $scope.message = "Error: " + response.status + " " + response.statusText;
+        }
+    );
 
 $scope.getStatistics = function(){
   statisticsFactory.query(
@@ -369,14 +407,80 @@ var createAndShowModifyUserSettingsModal = function(){
 
 }])
 
+.filter('duetomonthfilter', function() {
+  return function(input /*, param1, param2*/) {
 
-.controller('ExpenseController', ['$scope', '$state', 'baseURL', 'expenseFactory', '$ionicModal', function ($scope, $state, baseURL, expenseFactory, $ionicModal) {
+    if (typeof input !== 'undefined'){
+        var aYear = parseInt(input.toString().substring(0, 4));
+        var aMonth = parseInt(input.toString().substring(4, 6));
+
+        var out = aMonth.toString().concat(" / ").concat(aYear.toString());
+
+        return out;
+    } else {
+        return " - ";
+    }
+  };
+})
+
+.filter('customcurrencyfilter', function() {
+  return function(input, currCode) {
+
+      if (typeof input !== 'undefined' && typeof currCode !== 'undefined'){
+
+          console.log("Price and input defined: " );
+
+          var price = input.toString();
+          var pointsNeeded = Math.floor((price.length-1)/3);
+          console.log("points needed: " + pointsNeeded);
+
+		  if (pointsNeeded > 0){
+			var priceFormatted = price.split("");
+			console.log("priceFormatted: " + priceFormatted.toString() + " " + priceFormatted.length);
+
+			switch (pointsNeeded){
+				case 1: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); break;
+				case 2: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); priceFormatted.splice( (priceFormatted.length-7), 0, "." ); break;
+				case 3: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); priceFormatted.splice( (priceFormatted.length-7), 0, "." ); priceFormatted.splice( (priceFormatted.length-11), 0, "." ); break;
+				case 4: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); priceFormatted.splice( (priceFormatted.length-7), 0, "." ); priceFormatted.splice( (priceFormatted.length-11), 0, "." ); priceFormatted.splice( (priceFormatted.length-15), 0, "." ); break;
+				case 5: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); priceFormatted.splice( (priceFormatted.length-7), 0, "." ); priceFormatted.splice( (priceFormatted.length-11), 0, "." ); priceFormatted.splice( (priceFormatted.length-15), 0, "." ); break; priceFormatted.splice( (priceFormatted.length-19), 0, "." ); break;
+			}
+
+			console.log("priceFormatted new: " + priceFormatted.toString());
+
+			price = priceFormatted.join('');
+
+			console.log("new price string: " + price);
+		  }
+
+
+          var out = price.concat(" ").concat(currCode.toString());
+          return out;
+      } else {
+          return " - ";
+      }
+
+  };
+})
+
+
+.controller('ExpenseController', ['$scope', '$state', 'baseURL', 'expenseFactory', '$ionicModal', 'userSettingsFactory', function ($scope, $state, baseURL, expenseFactory, $ionicModal, userSettingsFactory) {
 
 $scope.showLoading = true;
 
 $scope.newExpensename = "expense name";
 $scope.newExpenseAmount = 0;
 
+$scope.currencyCodeForExpense = '';
+
+userSettingsFactory.query(
+        function (response) {
+            $scope.currencyCodeForExpense = response[0].currencySymbol;
+        },
+        function (response) {
+            $scope.message = "Error: " + response.status + " " + response.statusText;
+        }
+    );
 
 // Create the modifyexpense modal that we will use later
 $ionicModal.fromTemplateUrl('templates/modifyexpense.html', {
@@ -393,11 +497,14 @@ $ionicModal.fromTemplateUrl('templates/addnewexpense.html', {
 });
 
 // Create the deleteconfirm modal
-$ionicModal.fromTemplateUrl('templates/deleteexpenseconfirm.html', {
-    scope: $scope
-}).then(function (modal) {
-    $scope.deleteexpenseconfirm = modal;
-});
+var createAndShowDeleteExpenseConfirmModal = function(){
+    $ionicModal.fromTemplateUrl('templates/deleteexpenseconfirm.html', {
+      scope: $scope
+    }).then(function (modal) {
+      $scope.deleteexpenseconfirm = modal;
+      $scope.deleteexpenseconfirm.show();
+    });
+};
 
   $scope.expenses = [];
 
@@ -458,12 +565,20 @@ $ionicModal.fromTemplateUrl('templates/deleteexpenseconfirm.html', {
 
     };
 
-    $scope.doDeleteExpense = function(objectId) {
+    var objectIdToDelete;
+
+    $scope.deleteExpense = function(objectId){
+      objectIdToDelete = objectId;
+      createAndShowDeleteExpenseConfirmModal();
+    }
+
+    $scope.doDeleteExpense = function() {
 
         //$scope.deleteexpenseconfirm.show();
-        expenseFactory.delete({id: objectId}).$promise.then(
+        expenseFactory.delete({id: objectIdToDelete}).$promise.then(
                           function (response) {
                               $scope.showLoading = false;
+                              $scope.closeDeleteConfirmModal();
                               $scope.getExpenses();
                           },
                           function (response) {
@@ -498,6 +613,7 @@ $ionicModal.fromTemplateUrl('templates/deleteexpenseconfirm.html', {
 
     $scope.closeDeleteConfirmModal = function(){
       $scope.deleteexpenseconfirm.hide();
+      $scope.deleteexpenseconfirm.remove();
     }
 
     $scope.backToActoins = function(){
