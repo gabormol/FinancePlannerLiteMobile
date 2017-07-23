@@ -169,6 +169,17 @@ angular.module('FPLite.controllers', [])
       });
     }
 
+  var createAndShowAddPaidAmountModal = function(){
+      $ionicModal.fromTemplateUrl('templates/addpaidamount.html', {
+          scope: $scope
+        }).then(function (modal) {
+          $scope.addpaidamount = modal;
+          $scope.addpaidamount.show();
+        });
+      }
+
+    $scope.paidAmountToAdd = 0;
+
     $scope.timeshet = {};
 
       $scope.getTimesheet = function(){
@@ -236,10 +247,14 @@ angular.module('FPLite.controllers', [])
       var itemIdForDelete;
 
       $scope.deleteItem = function(amountPaid, timesheetId, itemId){
-        createAndShowDeleteItemModal();
-        amountPaidForDelete = amountPaid;
-        timesheetIdForDelete = timesheetId;
-        itemIdForDelete = itemId;
+        if (amountPaid === 0){
+          createAndShowDeleteItemModal();
+          amountPaidForDelete = amountPaid;
+          timesheetIdForDelete = timesheetId;
+          itemIdForDelete = itemId;
+        } else {
+          console.log("Can't delete paid item!");
+        }
       }
 
       $scope.doDeleteItem = function() {
@@ -281,19 +296,56 @@ angular.module('FPLite.controllers', [])
 
       }
 
+      //$scope.addPaymentToItem(item.itemName,item.amountPlanned,paidAmountToAdd,timesheetId,item._id)
+      $scope.addPaymentToItem = function(itemName, amountPlanned, paidAmountPaidYet, timesheetId, itemId){
+        $scope.modItemName = itemName;
+        $scope.modItemPlanned = amountPlanned;
+        $scope.modItemAmount = paidAmountPaidYet;
+        $scope.timesheetId = timesheetId;
+        $scope.modItemId = itemId;
+          createAndShowAddPaidAmountModal();
+      }
+
+      $scope.doAddPaymentToItem = function(addAmount){
+        var modItemAmount = parseInt($scope.modItemAmount);
+        var amountToAdd = parseInt(addAmount);
+        var newPaidAmount = modItemAmount + amountToAdd;
+        $scope.doModifyItem($scope.modItemName, $scope.modItemPlanned, newPaidAmount, $scope.modItemId, $scope.timesheetId);
+        $scope.closeAddPaidAmountModal();
+      }
+
+      $scope.doSetItemTotallyPaid = function(itemName, amountPlanned, amountPaid, timesheetId, itemId){
+
+        if (amountPaid > 0){
+          console.log('Can\'t set paid already paid item!');
+        } else {
+          console.log('Setting paid amount === planned...');
+          $scope.doModifyItem(itemName,amountPlanned, amountPlanned, itemId, timesheetId);
+        }
+        // item.itemName,item.amountPlanned,item.amountPaid,timesheetId,item._id
+
+      }
+
       $scope.closeAddModal = function(){
         $scope.addnewitemmodal.hide();
         $scope.addnewitemmodal.remove();
       }
 
       $scope.closeModifyModal = function(){
-        $scope.modifyitemmodal.hide();
-        $scope.modifyitemmodal.remove();
+        if(typeof $scope.modifyitemmodal !== 'undefined'){
+          $scope.modifyitemmodal.hide();
+          $scope.modifyitemmodal.remove();
+        }
       }
 
       $scope.closeDeleteConfirmModal = function(){
         $scope.deleteitemconfirm.hide();
         $scope.deleteitemconfirm.remove();
+      }
+
+      $scope.closeAddPaidAmountModal = function(){
+        $scope.addpaidamount.hide();
+        $scope.addpaidamount.remove();
       }
 
       $scope.backToActoins = function(){
@@ -428,15 +480,12 @@ var createAndShowModifyUserSettingsModal = function(){
 
       if (typeof input !== 'undefined' && typeof currCode !== 'undefined'){
 
-          console.log("Price and input defined: " );
 
           var price = input.toString();
           var pointsNeeded = Math.floor((price.length-1)/3);
-          console.log("points needed: " + pointsNeeded);
 
 		  if (pointsNeeded > 0){
 			var priceFormatted = price.split("");
-			console.log("priceFormatted: " + priceFormatted.toString() + " " + priceFormatted.length);
 
 			switch (pointsNeeded){
 				case 1: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); break;
@@ -446,11 +495,8 @@ var createAndShowModifyUserSettingsModal = function(){
 				case 5: priceFormatted.splice( (priceFormatted.length-3), 0, "." ); priceFormatted.splice( (priceFormatted.length-7), 0, "." ); priceFormatted.splice( (priceFormatted.length-11), 0, "." ); priceFormatted.splice( (priceFormatted.length-15), 0, "." ); break; priceFormatted.splice( (priceFormatted.length-19), 0, "." ); break;
 			}
 
-			console.log("priceFormatted new: " + priceFormatted.toString());
-
 			price = priceFormatted.join('');
 
-			console.log("new price string: " + price);
 		  }
 
 
