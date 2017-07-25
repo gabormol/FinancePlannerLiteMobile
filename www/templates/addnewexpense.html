@@ -6,7 +6,7 @@
       </div>
     </ion-header-bar>
     <ion-content>
-      <form ng-submit="doAddExpense(newExpensename,newExpenseAmount)">
+      <form ng-submit="doAddExpense(newExpensename,newExpenseAmount,newExpenseFrequency,newExpenseNextMonth,dueToMonthYear)">
         <div class="list">
           <label class="item item-input">
             <span class="input-label">Expense Name</span>
@@ -15,6 +15,18 @@
           <label class="item item-input">
             <span class="input-label">Planned</span>
             <input type="number" step="any" ng-model="newExpenseAmount" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Frequency</span>
+            <input type="number" min="1" max="12" tep="any" ng-model="newExpenseFrequency" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Next month</span>
+            <input type="number" step="any" ng-model="newExpenseNextMonth" required>
+          </label>
+          <label class="item item-input">
+            <span class="input-label">Due to</span>
+            <input type="month" id="monthpickup" ng-model="dueToMonthYear" required>
           </label>
           <label class="item">
             <button class="button button-block button-positive" type="submit">Add</button>

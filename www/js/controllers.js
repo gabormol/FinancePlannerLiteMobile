@@ -516,6 +516,20 @@ $scope.showLoading = true;
 
 $scope.newExpensename = "expense name";
 $scope.newExpenseAmount = 0;
+var currentYear = parseInt(new Date().getFullYear());
+var currentMonth = parseInt(new Date().getMonth());
+
+var newDate = new Date();
+var nextMonth = (parseInt(newDate.getMonth()) + 2);
+
+if (nextMonth > 12){
+  nextMonth = nextMonth - 12;
+}
+
+$scope.newExpenseFrequency = 12;
+$scope.newExpenseNextMonth = nextMonth;
+
+$scope.dueToMonthYear = new Date(currentYear+2, currentMonth +2, 1);
 
 $scope.currencyCodeForExpense = '';
 
@@ -569,14 +583,25 @@ var createAndShowDeleteExpenseConfirmModal = function(){
 
       $scope.getExpenses();
 
-    $scope.doAddExpense = function(expName, expAmount) {
+    $scope.doAddExpense = function(expName, expAmount, expenseFreq, expenseNextM, dueToMonth) {
 
-        $scope.newExpense = {
+      var date = new Date($scope.dueToMonthYear);
+        var aYear = date.getFullYear().toString();
+        var aMonth = (date.getMonth()+1).toString();
+        var reqMonthString = aYear.concat(aMonth);
+
+
+      console.log("NEW EXPENSE: " + expName + " " + " " + expAmount + " " + expenseFreq + " " + expenseNextM + " " + dueToMonth);
+    $scope.newExpense = {
         expensename: expName,
         amount: expAmount,
-        frequency: 12,
-        createdate: new Date()
+        frequency: expenseFreq,
+        createdate: newDate,
+        nextmonth: expenseNextM,
+        duetomonth: reqMonthString
     }
+
+    console.log("NEW EXPENSE: " + $scope.newExpense);
         expenseFactory.save($scope.newExpense).$promise.then(
                           function (response) {
                               $scope.showLoading = false;
@@ -594,9 +619,7 @@ var createAndShowDeleteExpenseConfirmModal = function(){
 
         var modExpense = {
         expensename: newName,
-        amount: newAmount,
-        frequency: 12,
-        createdate: new Date()
+        amount: newAmount
     }
         expenseFactory.update({id: objectId}, modExpense).$promise.then(
                           function (response) {
