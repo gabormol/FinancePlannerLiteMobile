@@ -513,6 +513,28 @@ var createAndShowModifyUserSettingsModal = function(){
   };
 })
 
+.directive('freqnotallowed', [ '$state', function($state) {
+    return {
+      require: 'ngModel',
+      link: function(scope, elem, attr, ngModel) {
+          var blacklist = attr.freqnotallowed.split(',');
+
+          //For DOM -> model validation
+          ngModel.$parsers.unshift(function(value) {
+             var valid = blacklist.indexOf(value) === -1;
+             ngModel.$setValidity('freqnotallowed', valid);
+             return valid ? value : 12;
+          });
+
+          //For model -> DOM validation
+          ngModel.$formatters.unshift(function(value) {
+             ngModel.$setValidity('freqnotallowed', blacklist.indexOf(value) === -1);
+             return value;
+          });
+      }
+   };
+}])
+
 
 .controller('ExpenseController', ['$scope', '$state', 'baseURL', 'expenseFactory', '$ionicModal', 'userSettingsFactory', function ($scope, $state, baseURL, expenseFactory, $ionicModal, userSettingsFactory) {
 
@@ -619,11 +641,25 @@ var createAndShowDeleteExpenseConfirmModal = function(){
 
     };
 
-    $scope.doModifyExpense = function(newName, newAmount, objectId) {
+    $scope.doModifyExpense = function(newName, newAmount, objectId,newFrequency,newNextMonth,newDueTo) {
 
-        var modExpense = {
+      var newDate = new Date(newDueTo);
+      var newYear = newDate.getFullYear().toString();
+      var newMonth = (newDate.getMonth()+1).toString();
+      var reqMonthString = newYear.concat(newMonth);
+
+      var modExpense = {
         expensename: newName,
-        amount: newAmount
+        amount: newAmount,
+        frequency: newFrequency,
+        nextmonth: newNextMonth,
+        duetomonth: reqMonthString
+    }
+
+    if (typeof $scope.duetomonth !== 'undefined'){
+        var aYear = parseInt($scope.duetomonth.toString().substring(0, 4));
+        var aMonth = parseInt($scope.duetomonth.toString().substring(4, 6));
+        $scope.duetoMonthForMP = new Date(aYear, aMonth-1, 1);
     }
         expenseFactory.update({id: objectId}, modExpense).$promise.then(
                           function (response) {
@@ -666,11 +702,21 @@ var createAndShowDeleteExpenseConfirmModal = function(){
 
     }
 
-    $scope.editExpense = function(expName, expAmount, expId) {
+    $scope.editExpense = function(expName, expAmount, expId, expFreq, expNextMonth, expDueTo) {
 
       $scope.modExpenseName = expName;
       $scope.modExpenseAmount = expAmount;
       $scope.modExpenseId = expId;
+      $scope.modExpenseFrequency = expFreq;
+      $scope.modExpenseNextMonth = expNextMonth;
+      console.log("expDueTo: " + expDueTo);
+      if (typeof expDueTo !== 'undefined'){
+        var aYear = parseInt(expDueTo.toString().substring(0, 4));
+        var aMonth = parseInt(expDueTo.toString().substring(4, 6));
+        $scope.modExpenseDueTo = new Date(aYear, aMonth-1, 1);
+      } else {
+        $scope.modExpenseDueTo = undefined;
+      }
 
       $scope.modifyexpmodal.show();
 
