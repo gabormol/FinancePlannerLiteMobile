@@ -459,6 +459,10 @@ var createAndShowModifyUserSettingsModal = function(){
 
 }])
 
+.controller('UserGuideController', ['$scope', '$ionicPlatform', '$ionicModal', function ($scope, $ionicPlatform, $ionicModal) {
+
+}])
+
 .filter('duetomonthfilter', function() {
   return function(input /*, param1, param2*/) {
 
