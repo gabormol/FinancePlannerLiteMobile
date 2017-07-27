@@ -21,7 +21,7 @@ angular.module('FPLite', ['ionic', 'ngCordova', 'FPLite.controllers','FPLite.ser
     }
       $timeout(function(){
                 $cordovaSplashscreen.hide();
-      },2000);
+      },5000);
   });
 
     $rootScope.$on('loading:show', function () {
