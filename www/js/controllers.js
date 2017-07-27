@@ -57,23 +57,6 @@ angular.module('FPLite.controllers', [])
     });
 
     // Create the login modal that we will use later
-    $ionicModal.fromTemplateUrl('templates/reserve.html', {
-        scope: $scope
-    }).then(function (modal) {
-        $scope.reserveform = modal;
-    });
-
-    // Triggered in the login modal to close it
-    $scope.closeReserve = function () {
-        $scope.reserveform.hide();
-    };
-
-    // Open the login modal
-    $scope.reserve = function () {
-        $scope.reserveform.show();
-    };
-
-    // Create the login modal that we will use later
     $ionicModal.fromTemplateUrl('templates/register.html', {
         scope: $scope
     }).then(function (modal) {
@@ -569,18 +552,24 @@ userSettingsFactory.query(
     );
 
 // Create the modifyexpense modal that we will use later
-$ionicModal.fromTemplateUrl('templates/modifyexpense.html', {
-    scope: $scope
-}).then(function (modal) {
-    $scope.modifyexpmodal = modal;
-});
+var createAndShowModifyExpenseModal = function(){
+  $ionicModal.fromTemplateUrl('templates/modifyexpense.html', {
+      scope: $scope
+    }).then(function (modal) {
+      $scope.modifyexpmodal = modal;
+      $scope.modifyexpmodal.show();
+    });
+  }
 
 // Create the addnewexpense modal that we will use later
-$ionicModal.fromTemplateUrl('templates/addnewexpense.html', {
-    scope: $scope
-}).then(function (modal) {
-    $scope.addnewexpmodal = modal;
-});
+var createAndShowAddNewExpenseModal = function(){
+  $ionicModal.fromTemplateUrl('templates/addnewexpense.html', {
+      scope: $scope
+    }).then(function (modal) {
+      $scope.addnewexpmodal = modal;
+      $scope.addnewexpmodal.show();
+    });
+  }
 
 // Create the deleteconfirm modal
 var createAndShowDeleteExpenseConfirmModal = function(){
@@ -611,7 +600,7 @@ var createAndShowDeleteExpenseConfirmModal = function(){
 
     $scope.doAddExpense = function(expName, expAmount, expenseFreq, expenseNextM, dueToMonth) {
 
-      var date = new Date($scope.dueToMonthYear);
+      var date = new Date(dueToMonth);
         var aYear = date.getFullYear().toString();
         var aMonth = (date.getMonth()+1).toString();
         var reqMonthString = aYear.concat(aMonth);
@@ -698,7 +687,7 @@ var createAndShowDeleteExpenseConfirmModal = function(){
 
     $scope.addNewExpense = function() {
 
-      $scope.addnewexpmodal.show();
+      createAndShowAddNewExpenseModal();
 
     }
 
@@ -718,16 +707,18 @@ var createAndShowDeleteExpenseConfirmModal = function(){
         $scope.modExpenseDueTo = undefined;
       }
 
-      $scope.modifyexpmodal.show();
+      createAndShowModifyExpenseModal();
 
     }
 
     $scope.closeAddModal = function(){
       $scope.addnewexpmodal.hide();
+      $scope.addnewexpmodal.remove();
     }
 
     $scope.closeModifyModal = function(){
       $scope.modifyexpmodal.hide();
+      $scope.modifyexpmodal.remove();
     }
 
     $scope.closeDeleteConfirmModal = function(){
