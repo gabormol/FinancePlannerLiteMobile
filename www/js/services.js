@@ -2,7 +2,7 @@
 
 angular.module('FPLite.services', ['ngResource'])
 .constant("baseURL", "https://financeplannerlite.mybluemix.net/")
- //.constant("baseURL", "http://192.168.2.74:3000/")
+// .constant("baseURL", "http://192.168.2.74:3000/")
 .factory('expenseFactory', ['$resource', 'baseURL', function ($resource, baseURL) {
 
         return $resource(baseURL + "expenses/:id", null, {
@@ -91,6 +91,7 @@ angular.module('FPLite.services', ['ngResource'])
 
     // Set the token as header for your requests!
     $http.defaults.headers.common['x-access-token'] = authToken;
+    $http.defaults.headers.common['token-expiration-ignore'] = true;
   }
 
   function destroyUserCredentials() {
@@ -98,6 +99,7 @@ angular.module('FPLite.services', ['ngResource'])
     username = '';
     isAuthenticated = false;
     $http.defaults.headers.common['x-access-token'] = authToken;
+    $http.defaults.headers.common['token-expiration-ignore'] = undefined;
     $localStorage.remove(TOKEN_KEY);
   }
 
